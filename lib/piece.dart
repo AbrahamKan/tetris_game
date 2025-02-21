@@ -1,36 +1,36 @@
-import 'package:flutter/services.dart';
-import 'package:tetris_game/board.dart';
-import 'package:tetris_game/values.dart';
+import 'package:flutter/services.dart';  // Importa la biblioteca de servicios de Flutter, aunque en este código no se usa.
+import 'package:tetris_game/board.dart';  // Importa el archivo 'board.dart' que probablemente contiene la configuración del tablero.
+import 'package:tetris_game/values.dart';  // Importa el archivo 'values.dart' que contiene valores como colores y constantes.
 
-class Piece{
+class Piece {  // Define la clase `Piece`, que representa una pieza de Tetris.
 
-  // type of tetris piece
+  // Tipo de pieza de Tetris (L, J, I, O, S, Z, T).
   Tetromino type;
 
+  // Constructor de la clase `Piece`, que requiere el tipo de pieza como argumento.
   Piece({required this.type});
 
-  // the piece is just a list of integers
+  // La posición de la pieza en el tablero, representada como una lista de enteros.
+  List<int> position = [];
 
-  List<int> position= [];
-
-  //Color of tetris piece\
-  Color get color{
+  // Color de la pieza de Tetris.
+  Color get color {
     return tetrominoColors[type] ??
-      const Color(0xFFFFFFFF); // Default to white if no color is found
+      const Color(0xFFFFFFFF);  // Si no se encuentra el color en `tetrominoColors`, usa blanco por defecto.
   }
 
-  // generate the integers 
-  void initializePiece(){
-    switch (type) {
+  // Método para inicializar la posición de la pieza en el tablero.
+  void initializePiece() {
+    switch (type) {  // Evalúa el tipo de pieza y asigna una lista de posiciones iniciales.
       case Tetromino.L:
         position = [
-          -26,
+          -26,  // Posiciones relativas en la cuadrícula del tablero.
           -16,
           -6,
           -5,
         ];
         break;
-        case Tetromino.J:
+      case Tetromino.J:
         position = [
           -25,
           -15,
@@ -38,7 +38,7 @@ class Piece{
           -6,
         ];
         break;
-        case Tetromino.I:
+      case Tetromino.I:
         position = [
           -4,
           -5,
@@ -46,7 +46,7 @@ class Piece{
           -7,
         ];
         break;
-        case Tetromino.O:
+      case Tetromino.O:
         position = [
           -15,
           -16,
@@ -54,7 +54,7 @@ class Piece{
           -6,
         ];
         break;
-        case Tetromino.S:
+      case Tetromino.S:
         position = [
           -15,
           -14,
@@ -62,7 +62,7 @@ class Piece{
           -5,
         ];
         break;
-        case Tetromino.Z:
+      case Tetromino.Z:
         position = [
           -17,
           -16,
@@ -70,7 +70,7 @@ class Piece{
           -5,
         ];
         break;
-        case Tetromino.T:
+      case Tetromino.T:
         position = [
           -26,
           -16,
@@ -79,107 +79,110 @@ class Piece{
         ];
         break;
       default:
+        // No hace nada si el tipo de pieza no coincide con ningún caso.
     }
   }
 
-  //move piece
-  void movePiece(Direction direction){
-    switch(direction){
-      case Direction.down:
-        for(int i=0; i<position.length; i++){
-          position[i]+= rowLength;
+  // Método para mover la pieza en el tablero.
+  void movePiece(Direction direction) {
+    switch (direction) {  // Evalúa la dirección del movimiento.
+      case Direction.down:  // Mover hacia abajo.
+        for (int i = 0; i < position.length; i++) {
+          position[i] += rowLength;  // Suma `rowLength` a cada posición para moverla una fila hacia abajo.
         }
         break;
-        case Direction.left:
-        for(int i=0; i<position.length; i++){
-          position[i] -= 1;
+      case Direction.left:  // Mover hacia la izquierda.
+        for (int i = 0; i < position.length; i++) {
+          position[i] -= 1;  // Resta 1 a cada posición para mover la pieza una columna a la izquierda.
         }
         break;
-        case Direction.right:
-        for(int i=0; i<position.length; i++){
-          position[i]+= 1;
+      case Direction.right:  // Mover hacia la derecha.
+        for (int i = 0; i < position.length; i++) {
+          position[i] += 1;  // Suma 1 a cada posición para mover la pieza una columna a la derecha.
         }
         break;
       default:
+        // No hace nada si la dirección no es válida.
     }
   }
 
-  // rotate piece
+///////////////////////////////////////////////
+  // Estado de rotación de la pieza. Comienza en 1.
   int rotationState = 1;
 
-  
-
-  void rotatePiece(){
-    //new position
+  // Método para rotar la pieza.
+  void rotatePiece() {
+    // Nueva posición después de la rotación.
     List<int> newPosition = [];
 
-    //rotate the piece based on it's type
+    // Determina la rotación según el tipo de pieza.
     switch (type) {
-      case Tetromino.L:
-        switch(rotationState) {
-          case 0:
-          newPosition = [
-            position[1] - rowLength,
-            position[1],
-            position[1] + rowLength,
-            position[1] + rowLength + 1,
-          ];
-          //check that this new position is a valid move before assigning it to the real position
-         if(piecePositionIsValid(newPosition)){
-           //update position
-          position = newPosition ;
-          // update rotation state
-          rotationState = (rotationState + 1) % 4;
-         }
-          break;
+      case Tetromino.L:  // Si la pieza es de tipo 'L'.
+        switch (rotationState) {  // Evalúa el estado de rotación actual.
 
-          case 1:
-          newPosition = [
-            position[1] - 1,
-            position[1],
-            position[1] + 1,
-            position[1] + rowLength - 1,
-          ];
-           //check that this new position is a valid move before assigning it to the real position
-         if(piecePositionIsValid(newPosition)){
-           //update position
-          position = newPosition ;
-          // update rotation state
-          rotationState = (rotationState + 1) % 4;
-         }
-          break;
+          case 0:  // Estado de rotación 0.
+            newPosition = [
+              position[1] - rowLength,       // Celda arriba de la celda base.
+              position[1],                   // Celda base.
+              position[1] + rowLength,       // Celda abajo de la celda base.
+              position[1] + rowLength + 1,   // Celda abajo a la derecha.
+            ];
+            // Verifica si la nueva posición es válida antes de asignarla.
+            if (piecePositionIsValid(newPosition)) {
+              // Actualiza la posición de la pieza.
+              position = newPosition;
+              // Cambia al siguiente estado de rotación (0 → 1 → 2 → 3 → 0).
+              rotationState = (rotationState + 1) % 4;
+            }
+            break;
 
-          case 2:
-          newPosition = [
-            position[1] + rowLength,
-            position[1],
-            position[1] - rowLength,
-            position[1] - rowLength - 1,
-          ];
-          //check that this new position is a valid move before assigning it to the real position
-         if(piecePositionIsValid(newPosition)){
-           //update position
-          position = newPosition ;
-          // update rotation state
-          rotationState = (rotationState + 1) % 4;
-         }
-          break;
+          case 1:  // Estado de rotación 1.
+            newPosition = [
+              position[1] - 1,               // Celda a la izquierda de la base.
+              position[1],                   // Celda base.
+              position[1] + 1,               // Celda a la derecha de la base.
+              position[1] + rowLength - 1,   // Celda abajo a la izquierda.
+            ];
+            // Verifica si la nueva posición es válida.
+            if (piecePositionIsValid(newPosition)) {
+              // Actualiza la posición de la pieza.
+              position = newPosition;
+              // Cambia al siguiente estado de rotación.
+              rotationState = (rotationState + 1) % 4;
+            }
+            break;
 
-          case 3:
-          newPosition = [
-            position[1] - rowLength + 1,
-            position[1],
-            position[1] + 1,
-            position[1] - 1,
-          ];
-          //check that this new position is a valid move before assigning it to the real position
-         if(piecePositionIsValid(newPosition)){
-           //update position
-          position = newPosition ;
-          // update rotation state
-          rotationState = 0; // reset rotation state to 0 
-         }
-          break;
+          case 2:  // Estado de rotación 2.
+            newPosition = [
+              position[1] + rowLength,       // Celda abajo de la base.
+              position[1],                   // Celda base.
+              position[1] - rowLength,       // Celda arriba de la base.
+              position[1] - rowLength - 1,   // Celda arriba a la izquierda.
+            ];
+            // Verifica si la nueva posición es válida.
+            if (piecePositionIsValid(newPosition)) {
+              // Actualiza la posición de la pieza.
+              position = newPosition;
+              // Cambia al siguiente estado de rotación.
+              rotationState = (rotationState + 1) % 4;
+            }
+            break;
+
+          case 3:  // Estado de rotación 3.
+            newPosition = [
+              position[1] - rowLength + 1,   // Celda arriba a la derecha.
+              position[1],                   // Celda base.
+              position[1] + 1,               // Celda a la derecha de la base.
+              position[1] - 1,               // Celda a la izquierda de la base.
+            ];
+            // Verifica si la nueva posición es válida.
+            if (piecePositionIsValid(newPosition)) {
+              // Actualiza la posición de la pieza.
+              position = newPosition;
+              // Restablece el estado de rotación a 0 (vuelve al inicio del ciclo).
+              rotationState = 0;
+            }
+            break;
         }
         break;
 
@@ -313,7 +316,7 @@ class Piece{
            //update position
           position = newPosition ;
           // update rotation state
-          rotationState = 0; // reset rotation state to 0 
+          rotationState = 0; // reset rotation state to 0
          }
           break;
         }
@@ -521,7 +524,7 @@ case Tetromino.Z:
            //update position
           position = newPosition ;
           // update rotation state
-          rotationState = 0; // reset rotation state to 0 
+          rotationState = 0; // reset rotation state to 0
          }
           break;
         }
@@ -529,47 +532,52 @@ case Tetromino.Z:
     }
   }
 
-  // check if valid position
-  bool positionIsValid(int position){
-    // get the row and col of position
+  // Verifica si una posición individual en el tablero es válida.
+  bool positionIsValid(int position) {
+    // Obtiene la fila en la que se encuentra la posición.
     int row = (position / rowLength).floor();
+    // Obtiene la columna en la que se encuentra la posición.
     int col = position % rowLength;
 
-    //if the position is taken, return false
-    if (row < 0 || col < 0 || gameBoard[row][col] != null){
+    // Si la posición está fuera de los límites o ya está ocupada en el tablero, retorna falso.
+    if (row < 0 || col < 0 || gameBoard[row][col] != null) {
       return false;
     }
 
-    // otherwise position is valid so return true
-    else{
+    // De lo contrario, la posición es válida y retorna verdadero.
+    else {
       return true;
     }
   }
 
-  // check if piece is valid position
-  bool piecePositionIsValid (List<int> piecePosition){
+  // Verifica si toda una pieza puede ubicarse en una posición válida.
+  bool piecePositionIsValid(List<int> piecePosition) {
+    // Variables para detectar si la pieza ocupa la primera o la última columna.
     bool firstColOccupied = false;
     bool lastColOccupied = false;
 
-    for(int pos in piecePosition){
-      //return false if any position is already taken
-      if (!positionIsValid(pos)){
+    // Itera sobre cada celda de la pieza.
+    for (int pos in piecePosition) {
+      // Si alguna posición ya está ocupada o es inválida, retorna falso.
+      if (!positionIsValid(pos)) {
         return false;
       }
 
-      // get the col of position
+      // Obtiene la columna en la que se encuentra la posición actual.
       int col = pos % rowLength;
 
-      // check if the first or last column is occupled
-      if(col == 0){
+      // Verifica si alguna parte de la pieza está en la primera columna.
+      if (col == 0) {
         firstColOccupied = true;
       }
+      // Verifica si alguna parte de la pieza está en la última columna.
       if (col == rowLength - 1) {
         lastColOccupied = true;
       }
     }
 
-    // if there is a piece in the first col and last col, going throught the wall
+    // Si la pieza ocupa tanto la primera como la última columna, significa que atraviesa la pared del tablero.
+    // En este caso, retorna falso para evitar la rotación ilegal.
     return !(firstColOccupied && lastColOccupied);
   }
 }
